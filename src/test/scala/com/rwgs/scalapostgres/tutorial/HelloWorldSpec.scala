@@ -1,4 +1,4 @@
-package com.example.tutorial.tutorial
+package com.rwgs.scalapostgres.tutorial
 
 import cats.effect.IO
 import org.http4s._

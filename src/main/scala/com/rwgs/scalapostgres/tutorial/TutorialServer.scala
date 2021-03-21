@@ -1,10 +1,8 @@
-package com.example.tutorial.tutorial
+package com.rwgs.scalapostgres.tutorial
 
-import cats.effect.{ConcurrentEffect, ContextShift, IO, Timer}
-import cats.implicits._
-import com.example.tutorial.tutorial.persistent.UserRepository
-import com.example.tutorial.tutorial.persistent.postgresrepository.PostgresUserRepository
-import doobie.free.connection.ConnectionIO
+import cats.effect.{ConcurrentEffect, ContextShift, Timer}
+//import cats.implicits._
+import com.rwgs.scalapostgres.tutorial.persistent.postgresrepository.PostgresUserRepository
 import doobie.util.transactor
 import fs2.Stream
 import org.http4s.client.blaze.BlazeClientBuilder
@@ -16,11 +14,11 @@ import scala.concurrent.ExecutionContext.global
 
 object TutorialServer {
 
-  def stream[F[_]: ConcurrentEffect](xa: transactor.Transactor[F])(
-      implicit T: Timer[F],
-      C: ContextShift[F]): Stream[F, Nothing] = {
+  def stream[F[_]: ConcurrentEffect](
+    xa: transactor.Transactor[F]
+  )(implicit T: Timer[F], C: ContextShift[F]): Stream[F, Nothing] = {
     for {
-      client <- BlazeClientBuilder[F](global).stream
+      client <- BlazeClientBuilder[F](global).stream  //TODO - review this line
 
       userRepo = new PostgresUserRepository {}
 
@@ -36,4 +34,5 @@ object TutorialServer {
         .serve
     } yield exitCode
   }.drain
+
 }

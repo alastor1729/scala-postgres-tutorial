@@ -5,7 +5,7 @@ services:
     container_name: postgres-tutorial
     command: postgres -c 'max_connections=300'
     ports:
-        - "5432:5432"
+        - "5433:5433"
     environment:
       POSTGRES_DB: tutorial
       POSTGRES_USER: tutorial
