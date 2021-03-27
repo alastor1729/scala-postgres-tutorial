@@ -6,7 +6,7 @@ import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 import org.http4s.circe.CirceEntityCodec._
 import com.rwgs.scalapostgres.tutorial.domain.User
-import com.rwgs.scalapostgres.tutorial.persistent.UserRepository
+import com.rwgs.scalapostgres.tutorial.persistence.UserRepository
 import doobie.free.connection.ConnectionIO
 import doobie.implicits._
 import doobie.util.transactor

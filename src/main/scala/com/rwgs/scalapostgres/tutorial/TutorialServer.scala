@@ -2,7 +2,7 @@ package com.rwgs.scalapostgres.tutorial
 
 import cats.effect.{ConcurrentEffect, ContextShift, Timer}
 //import cats.implicits._
-import com.rwgs.scalapostgres.tutorial.persistent.postgresrepository.PostgresUserRepository
+import com.rwgs.scalapostgres.tutorial.persistence.postgresrepository.PostgresUserRepository
 import doobie.util.transactor
 import fs2.Stream
 import org.http4s.client.blaze.BlazeClientBuilder

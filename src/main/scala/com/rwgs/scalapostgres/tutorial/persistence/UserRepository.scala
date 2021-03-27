@@ -1,4 +1,4 @@
-package com.rwgs.scalapostgres.tutorial.persistent
+package com.rwgs.scalapostgres.tutorial.persistence
 
 import com.rwgs.scalapostgres.tutorial.domain.User
 import doobie.free.connection.ConnectionIO

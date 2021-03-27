@@ -1,7 +1,7 @@
-package com.rwgs.scalapostgres.tutorial.persistent.postgresrepository
+package com.rwgs.scalapostgres.tutorial.persistence.postgresrepository
 
 import com.rwgs.scalapostgres.tutorial.domain.User
-import com.rwgs.scalapostgres.tutorial.persistent.UserRepository
+import com.rwgs.scalapostgres.tutorial.persistence.UserRepository
 import doobie.{FCS, HC}
 import doobie.free.connection.ConnectionIO
 import doobie.implicits._
