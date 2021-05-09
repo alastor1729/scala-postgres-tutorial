@@ -1,8 +1,6 @@
 package com.rwgs.scalapostgres.tutorial.persistence
 package models
 
-import cats.{Eq, Show}
-import io.circe.Decoder
 import org.joda.time.DateTime
 
 case class LoginDetails(
@@ -27,17 +25,6 @@ case class LoginDetails(
    memberNumber: Option[String],
    failedRetrievalAttempts: Int,
    firstTimeLoggedIn: Option[DateTime]
-  /*
-  member_number: Option[String],
-  failed_retrieval_attempts: Int,
-  first_logged_in_dt: Option[Timestamp]
-
-  ///////////////////////////////////////////////////////////////////////////////////////////
-
-  memberNumber: Option[String],
-  failedRetrievalAttempts: Int,
-  firstTimeLoggedIn: Option[DateTime]
-   */
  ){
   def withStatus(
           newStatus: AccountStatus.Value,
@@ -45,24 +32,6 @@ case class LoginDetails(
                 ) =
     copy(status = newStatus, lastStatusChangeDate = when)
 }
-
-import io.chrisdavenport.fuuid.circe._ //need this for "Lazy implicit value of type io.circe.generic.extras.decoding.UnwrappedDecoder[com.rwgs.scalapostgres.tutorial.persistence.models.UserId]"
-import io.chrisdavenport.fuuid.FUUID
-import io.chrisdavenport.fuuid.http4s.FUUIDVar
-import io.circe.generic.extras.semiauto.deriveUnwrappedDecoder
-
-//final case class UserId(value: FUUID) extends AnyVal
-//
-//object UserId {
-//  implicit val eq: Eq[UserId] = Eq.fromUniversalEquals
-//  implicit val show: Show[UserId] = Show.show(_.value.show)
-//  implicit val decoder: Decoder[UserId] = deriveUnwrappedDecoder[UserId]
-//}
-//
-//object UserIdVar {
-//  def unapply(s: String): Option[UserId] =
-//    FUUIDVar.unapply(s).map(UserId(_))
-//}
 
 object AccountStatus extends Enumeration {
   // DO NOT CHANGE THE NAME OR NUMBER OF THESE, JUST ADD

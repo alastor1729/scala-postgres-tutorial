@@ -1,17 +1,17 @@
 package com.rwgs.scalapostgres.tutorial.persistence
 
-import cats.effect.{Effect, Sync}
+import cats.effect.{Effect, IO, Sync}
 import com.rwgs.scalapostgres.tutorial.persistence.models.{AccountStatus, AggregationType, FetchRequestEnding, LoginDetails}
 import doobie.implicits._
 import doobie.util.transactor.Transactor
 import org.joda.time.format.ISODateTimeFormat
-//import io.chrisdavenport.fuuid.FUUID
 import java.sql.Timestamp
 import java.util.UUID
 import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.DateTimeFormatter
 
 trait LoginAccountsRepository[F[_]] {
+  def getPrimaryLoginDetailsByUserId(userId: String): Option[LoginDetails]
 
   def getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
      status: AccountStatus.Value,
@@ -32,6 +32,18 @@ object LoginAccountsRepository {
 
   def build[F[_]: Sync ](transactor: Transactor[F])(implicit F: Effect[F]): LoginAccountsRepository[F] =
     new LoginAccountsRepository[F] {
+
+      def toIO[A](f: F[A]): IO[A] =
+        IO.async { cb =>
+          F.runAsync(f)(r => IO(cb(r))).unsafeRunSync()
+        }
+
+      override def getPrimaryLoginDetailsByUserId(userId: String): Option[LoginDetails] = {
+        val loginDetailsF =
+          LoginAccountsQueries.getPrimaryLoginDetailsByUserIdQuery(userId).option.transact(transactor)
+
+        toIO(loginDetailsF).unsafeRunSync()
+      }
 
       override def getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
             status: AccountStatus.Value,
@@ -68,8 +80,8 @@ object LoginAccountsRepository {
 object LoginAccountsQueries {
 
   import doobie._
-  import doobie.implicits.javasql._                  // need this for "could not find implicit value for parameter ev: doobie.util.meta.Meta[java.sql.Timestamp]"
-  import io.chrisdavenport.fuuid.doobie.implicits._  // need this for "Cannot find or construct a Read instance for type (com.rwgs.scalapostgres.tutorial.persistence.models.LoginDetails)"
+  import doobie.implicits.javasql._                    // need this for "could not find implicit value for parameter ev: doobie.util.meta.Meta[java.sql.Timestamp]"
+  import io.chrisdavenport.fuuid.doobie.implicits._    // need this for "Cannot find or construct a Read instance for type (com.rwgs.scalapostgres.tutorial.persistence.models.LoginDetails)"
 
   implicit val uuidMeta: Meta[UUID] = Meta[String].imap(UUID.fromString)(_.toString)
   implicit val fetchRequestEndingMeta: Meta[FetchRequestEnding.Value] = Meta[Int].imap(FetchRequestEnding(_))(_.id)
@@ -136,10 +148,6 @@ object LoginAccountsQueries {
     //format.print(dateTime.toDateTime(utcTimeZone))
     val changedFormatted: String = format.print(date.toDateTime(utcTimeZone))
 
-    println(s"!!!!!!!!!!!!! status.id = ${status.id}")
-    println(s"!!!!!!!!!!!!! dbDateFormatter.print(date) = $changedFormatted")
-    println(s"!!!!!!!!!!!!! iAggregationTypes = $iAggregationTypes")
-
     sql"""
       SELECT count(*)
       FROM login_accounts
@@ -161,10 +169,6 @@ object LoginAccountsQueries {
 
     val iAggregationTypes: List[Int] = aggregationTypes.map(_.id)
     val changedFormatted: String = format.print(changedEarlierThan.toDateTime(utcTimeZone))
-
-    println(s"!!!!!!!!!!!!! status.id = ${status.id}")
-    println(s"!!!!!!!!!!!!! changedEarlierThan / changedFORMATTED = $changedFormatted")
-    println(s"!!!!!!!!!!!!! iAggregationTypes = $iAggregationTypes")
 
     val query = sql"""
         UPDATE login_accounts SET fixed = true

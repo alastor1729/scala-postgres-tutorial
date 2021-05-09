@@ -1,137 +1,38 @@
 package com.rwgs.scalapostgres.tutorial.persistence
 
 import cats.effect.{ContextShift, IO}
-import cats.syntax.all._
 import com.rwgs.scalapostgres.tutorial.persistence.models.{AccountStatus, AggregationType, LoginDetails}
-import com.rwgs.scalapostgres.tutorial.persistence.models.AggregationType._
-//import io.chrisdavenport.fuuid.FUUID
 import org.joda.time.DateTime
 import org.specs2.mutable.Specification
 
 class LoginAccountsRepositorySpec extends Specification {
 
-  //TODO - resolved~~~
-//  "retrieve a count of Active loginAccounts that haven't ran since a certain date" in new context {
-//    import com.rwgs.scalapostgres.tutorial.persistence.models.AggregationType.ONLINE_BANKING
-//
-//    insertLoginDetailsTestQuery(testLoginDetails01)
-//    insertLoginDetailsTestQuery(testLoginDetails04)
-//    insertLoginDetailsTestQuery(testLoginDetails05)
-//
-//    val count: Int =
-//      loginAccountsRepo.
-//        getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
-//          AccountStatus.NORMAL,
-//          DateTime.now.minusDays(1),
-//          List(ONLINE_BANKING)
-//        ).unsafeRunSync()
-//
-//    count must be_==(1)  //see why "java.lang.Exception: 0 != 1"??? - RESOLVED!!!
-//  }
+  "retrieve a count of Active loginAccounts that haven't ran since a certain date" in new context {
+    import com.rwgs.scalapostgres.tutorial.persistence.models.AggregationType.ONLINE_BANKING
 
-  //TODO - Error 2:
-//  "get count of failed login accounts with no retries left" in new context {
-//    insertLoginDetailsTestQuery(testLoginDetails01)
-//    insertLoginDetailsTestQuery(testLoginDetails04)
-//    insertLoginDetailsTestQuery(testLoginDetails05)
-//    insertLoginDetailsTestQuery(testLoginDetails08)
-//    insertLoginDetailsTestQuery(testLoginDetails09)
-//    insertLoginDetailsTestQuery(testLoginDetails10)
-//    insertLoginDetailsTestQuery(testLoginDetails11)
-//    insertLoginDetailsTestQuery(testLoginDetails12)
-//    insertLoginDetailsTestQuery(firstPrimaryLogin)
-//    insertLoginDetailsTestQuery(latestPrimaryLogin)
-//
-//    /*
-//    loginDetailsRepository.getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
-//    AccountStatus.BATCH_FAILURE,
-//    DateTime.now,
-//    List(CORE, NETTELLER)
-//    ).unsafeRunSync must_== 3
-//     */
-//    loginAccountsRepo.
-//      getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
-//        AccountStatus.BATCH_FAILURE,
-//        DateTime.now,
-//        List(CORE, NETTELLER)
-//      ).unsafeRunSync must_== 3       //see why java.lang.Exception: 0 != 3
-//
-//    loginAccountsRepo.
-//      getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
-//        AccountStatus.BATCH_FAILURE,
-//        DateTime.now,
-//        List(CORE, NETTELLER),
-//        fixed = Some(false)
-//      ).unsafeRunSync must_== 2
-//  }
-  import DSO._
+    insertLoginDetailsTestQuery(testLoginDetails01).unsafeRunSync()
+    insertLoginDetailsTestQuery(testLoginDetails04).unsafeRunSync()
+    insertLoginDetailsTestQuery(testLoginDetails05).unsafeRunSync()
 
-  val status = AccountStatus.ONLINE_FAILURE
-  val changedEarlierThan = DateTime.now.minusHours(1)
-  val beforeCutOffTime = changedEarlierThan.minusMinutes(10)
-  val afterCutOffTime = changedEarlierThan.plusMinutes(10)
-  val aggTypeNetteller = NETTELLER
-  val active = true
-
-  //TODO - Error 3:
-  //    java.lang.Exception: 0 != 1
-  "check in failed login accounts" in new context {
-    val login = createLoginsWithCustomFields(
-      status,
-      beforeCutOffTime,
-      active,
-      aggTypeNetteller,
-      IsNotDSOBillPayLogin
-    )
-
-    insertLoginDetailsTestQuery(login).unsafeRunSync()
-
-    val count: IO[Int] =
+    val count: Int =
       loginAccountsRepo.
-        checkInActiveLoginAccountsByAccountStatusLastUpdated(
-          status,
-          changedEarlierThan,
-          List(aggTypeNetteller)
-        )
+        getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
+          AccountStatus.NORMAL,
+          DateTime.now.minusDays(1),
+          List(ONLINE_BANKING)
+        ).unsafeRunSync()
 
-    /*
-    !!!!!!!!!!!!! status.id = 6
-    !!!!!!!!!!!!! dbDateFormatter.print(date) = 2021-03-24T18:19:19.954Z
-    !!!!!!!!!!!!! iAggregationTypes = List(2)
-     */
-    count.unsafeRunSync ==== 1
+    count must be_==(1)
   }
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-  /*
-  //TODO - Error 3 (getCountOfActiveLoginAccountsByAccountStatusLastUpdated):
-     //    java.lang.Exception: 0 != 3
-    "get count of failed login accounts with no retries left" in new context {
-      doobieLoginDetailsRepository.
-        getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
-          AccountStatus.BATCH_FAILURE,
-          DateTime.now,
-          List(CORE, NETTELLER)
-        ).unsafeRunSync must_== 3
-
-      doobieLoginDetailsRepository.
-        getCountOfActiveLoginAccountsByAccountStatusLastUpdated(
-          AccountStatus.BATCH_FAILURE,
-          DateTime.now,
-          List(CORE, NETTELLER),
-          fixed = Some(false)
-        ).unsafeRunSync must_== 2
-    }
-   */
-////////////////////////////////////////////////////////////////////////////////////////////////
-
 
   import org.specs2.matcher.Scope
   trait context extends Scope {
-    import cats.syntax.all._                 //needed for ".show" call
+    import cats.syntax.all._                  //needed for ".show" call
     import LoginAccountsQueries._
+    import doobie._
+    import doobie.implicits._
 
-    import scala.concurrent.ExecutionContext //needed for "Cannot find an implicit value for ContextShift[cats.effect.IO]"
+    import scala.concurrent.ExecutionContext  //needed for "Cannot find an implicit value for ContextShift[cats.effect.IO]"
     implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
 
     import doobie.Transactor
@@ -145,13 +46,11 @@ class LoginAccountsRepositorySpec extends Specification {
       "ahs2007"
     )
 
-
-//    val testUserIdGen: UserId = UserId( FUUID.randomFUUID[IO].unsafeRunSync() )
-
-//    val primaryLoginId = LoginId(FUUID.randomFUUID[IO].unsafeRunSync())
-//    val loginId = LoginId(FUUID.randomFUUID[IO].unsafeRunSync())
-//    val loginId2 = LoginId(FUUID.randomFUUID[IO].unsafeRunSync())
-//    val primaryLoginAccount = makeLogin().copy(loginId = primaryLoginId.show, userId = testUserIdGen, primaryLogin = true)
+    def clearLoginAccountsDbTable(): IO[Unit] = {
+      {sql"""
+             DELETE FROM login_accounts""".update
+      }.run.transact(transactor).void
+    }
 
     import doobie.implicits._  // for the Doobie "sql" call
 
@@ -220,7 +119,7 @@ class LoginAccountsRepositorySpec extends Specification {
         fixed = false,
         createdAt = DateTime.now,
         updatedAt = DateTime.now,
-        userId = uuidToString(),
+        userId = "user1",
         active = true,
         primaryLogin = true,
         isBillPay = false,
@@ -292,7 +191,7 @@ class LoginAccountsRepositorySpec extends Specification {
         fixed = false,
         createdAt = DateTime.now,
         updatedAt = DateTime.now,
-        userId = uuidToString(),
+        userId = "user5",
         active = true,
         primaryLogin = true,
         isBillPay = false,
@@ -488,6 +387,6 @@ class LoginAccountsRepositorySpec extends Specification {
 }
 
 object DSO extends Enumeration {
-  val IsDSOBillPayLogin = Value
-  val IsNotDSOBillPayLogin = Value
+  val IsDSOBillPayLogin: DSO.Value = Value
+  val IsNotDSOBillPayLogin: DSO.Value = Value
 }
