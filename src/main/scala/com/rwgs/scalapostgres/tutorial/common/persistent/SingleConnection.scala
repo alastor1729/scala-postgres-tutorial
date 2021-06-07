@@ -12,7 +12,7 @@ object SingleConnection {
       driver = "org.postgresql.Driver",
       url = "jdbc:postgresql://localhost:5432/postgres",
       user = "postgres",
-      pass = "ahs2007",
+      pass = "password",
       blocker = Blocker.liftExecutionContext(ExecutionContexts.synchronous)
     )
 

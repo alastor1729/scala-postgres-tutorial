@@ -12,7 +12,7 @@ object Main extends IOApp {
       "org.postgresql.Driver",
       "jdbc:postgresql://localhost:5432/postgres",
       "postgres",
-      "ahs2007"
+      "password"
     )
 
   def run(args: List[String]): IO[ExitCode] =

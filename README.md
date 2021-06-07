@@ -10,17 +10,12 @@ https://github.com/emmettna/scalapostgrestutorial
 
 // TODOs:
 1) change hard-coded-values by creating Config.scala file
-2) add "testContainers" library
+2) add "testContainers" library and use this library
 3) ScalaCheck / or Specs2
 4) Migrations ( FLYWAY ) - check "banno-business" project
    4a) follow Flyway Banno example (https://github.com/Banno/banno-business#banno-organizations-persistence)
 
-
-PS,
-Skunk may replace Doobie (in near future)?
-** team-based-decision
-
-PPS,
+PS, for now:
 * No need for Jenkins / CICD stuff needed (for now)
 * No need for ScalaFmt PlugIn
 * maybe need to add Jabberwocky as "CodeOwners"

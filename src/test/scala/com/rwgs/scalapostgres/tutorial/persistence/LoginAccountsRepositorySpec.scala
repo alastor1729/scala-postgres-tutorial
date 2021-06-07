@@ -43,7 +43,7 @@ class LoginAccountsRepositorySpec extends Specification {
       "org.postgresql.Driver",
       "jdbc:postgresql://localhost:5432/postgres",
       "postgres",
-      "ahs2007"
+      "password"
     )
 
     def clearLoginAccountsDbTable(): IO[Unit] = {
