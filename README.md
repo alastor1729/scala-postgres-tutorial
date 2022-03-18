@@ -1,4 +1,4 @@
-# BannoScalaPostgresTutorial
+# DoobieScalaPostgresTutorial
 Basic example of using Http4s + Doobie + Postgres (local environment) combination with minimal implementations.
 
 Forked from here:
@@ -13,9 +13,8 @@ https://github.com/emmettna/scalapostgrestutorial
 2) add "testContainers" library and use this library
 3) ScalaCheck / or Specs2
 4) Migrations ( FLYWAY ) - check "banno-business" project
-   4a) follow Flyway Banno example (https://github.com/Banno/banno-business#banno-organizations-persistence)
+   ** ex: Flyway Banno example (https://github.com/Banno/banno-business#banno-organizations-persistence)
 
 PS, for now:
 * No need for Jenkins / CICD stuff needed (for now)
 * No need for ScalaFmt PlugIn
-* maybe need to add Jabberwocky as "CodeOwners"
