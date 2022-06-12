@@ -8,9 +8,9 @@ https://github.com/emmettna/scalapostgrestutorial
 
 
 
-// TODOs:
+TODOs:
 1) change hard-coded-values by creating Config.scala file
-2) add "testContainers" library and use this library
+2) add "testContainers" library and use testContainers
 3) ScalaCheck / or Specs2
 4) Migrations ( FLYWAY ) - check "banno-business" project
    ** ex: Flyway Banno example (https://github.com/Banno/banno-business#banno-organizations-persistence)
